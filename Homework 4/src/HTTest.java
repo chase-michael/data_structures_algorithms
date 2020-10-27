@@ -78,13 +78,14 @@ public class HTTest {
         theHashTable.remove(testValue);
         System.out.println("Number of items: " + theHashTable.size());
         System.out.println("Frequency of 'learned': " + theHashTable.showFrequency("learned"));
-        System.out.println("Frequency of 'Learned': " + theHashTable.showFrequency("Learned"));
-        System.out.println("Frequency of 'Learned': " + theHashTable.showFrequency(null));
-        System.out.println("Frequency of 'Learned': " + theHashTable.showFrequency(""));
+        //System.out.println("Frequency of 'Learned': " + theHashTable.showFrequency("Learned"));
+        //System.out.println("Frequency of 'Learned': " + theHashTable.showFrequency(null));
+        //System.out.println("Frequency of 'Learned': " + theHashTable.showFrequency(""));
 
         System.out.println("");
         System.out.print("Table: ");
         theHashTable.display();
+        theHashTable.hashValue(null);
     }
 
     /**
