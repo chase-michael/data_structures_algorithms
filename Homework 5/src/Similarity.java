@@ -1,10 +1,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.rmi.NoSuchObjectException;
+import java.util.*;
 
 /**
  * The similarities between documents are to be determined by the degree of the
@@ -43,7 +42,9 @@ public class Similarity {
      * @param input A string of text to initialize the HashMap with.
      */
     public Similarity(String input) {
-
+        if (input == null) throw new NullPointerException();
+        if (input.equals("")) return;
+        insertWordsToMap(input.split("\\W+"));
     }
 
     /**
@@ -52,7 +53,42 @@ public class Similarity {
      * @param file A file to read for word frequencies from
      */
     public Similarity(File file) {
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        List<String> lines = new ArrayList<>();
+        while (scanner.hasNextLine()) {
+            lines.add(scanner.nextLine());
+            numOfLines++;
+        }
+        for (String line : lines) {
+            insertWordsToMap(line.split("\\W+"));
+        }
+    }
 
+    private void insertWordsToMap(String[] words) {
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i].toLowerCase();
+            if (isAValidWord(word)) {
+                if (hashMap.containsKey(word)) {
+                    hashMap.replace(word, hashMap.get(word).add(BigInteger.ONE));
+                } else {
+                    hashMap.put(word, BigInteger.ONE);
+                }
+            }
+        }
+    }
+
+    private boolean isAValidWord(String word) {
+        if (word.equals("")) return false;
+        int length = word.length();
+        for (int i = 0; i < length; i++) {
+            if (!Character.isLetter(word.charAt(i))) return false;
+        }
+        return true;
     }
 
     /**
@@ -61,17 +97,21 @@ public class Similarity {
      * @return The number of lines present in the file.
      */
     public int numOfLines() {
-        return 0;
+        return numOfLines;
     }
 
     /**
-     * Number of words present in the internal HashMap. This uses the frequecies of
+     * Number of words present in the internal HashMap. This uses the frequencies of
      * each word, and thus, takes into account duplicate words.
      *
      * @return Total number of words in the HashMap
      */
     public BigInteger numOfWords() {
-        return 0;
+        BigInteger wordCount = BigInteger.ZERO;
+        for (BigInteger frequency : hashMap.values()) {
+            wordCount = wordCount.add(frequency);
+        }
+        return wordCount;
     }
 
     /**
@@ -80,7 +120,11 @@ public class Similarity {
      * @return Return number of distinct words in the dataset
      */
     public int numOfWordsNoDups() {
-        return 0;
+        int wordCount = 0;
+        for (String ignored : hashMap.keySet()) {
+            wordCount++;
+        }
+        return wordCount;
     }
 
     /**
@@ -89,7 +133,20 @@ public class Similarity {
      * @return The euclidean norm of the internal HashMap.
      */
     public double euclideanNorm() {
-        return 0;
+        double eN = 0;
+        for (BigInteger frequency : hashMap.values()) {
+            eN += Math.pow(frequency.doubleValue(), 2);
+        }
+        return Math.sqrt(eN);
+    }
+
+    public double euclideanNorm(Map<String, BigInteger> map) {
+        if (map == null) throw new NullPointerException();
+        double eN = 0;
+        for (BigInteger frequency : map.values()) {
+            eN += Math.pow(frequency.doubleValue(), 2);
+        }
+        return Math.sqrt(eN);
     }
 
     /**
@@ -102,7 +159,15 @@ public class Similarity {
      * @return The dot product scalar value
      */
     public double dotProduct(Map<String, BigInteger> map) {
-        return 0;
+        if (map == null) throw new NullPointerException();
+        if (map.isEmpty() || hashMap.isEmpty()) return 0;
+        double dotProduct = 0;
+        for (String word : map.keySet()) {
+            if (hashMap.get(word) != null) {
+                dotProduct += hashMap.get(word).doubleValue() * map.get(word).doubleValue();
+            }
+        }
+        return dotProduct;
     }
 
     /**
@@ -113,7 +178,9 @@ public class Similarity {
      * @return the scalar distance value
      */
     public double distance(Map<String, BigInteger> map) {
-        return 0;
+        if (map == null) throw new NullPointerException();
+        double euclideanProduct = euclideanNorm() * euclideanNorm(map);
+        return Math.acos(dotProduct(map) / euclideanProduct);
     }
 
     /**
@@ -122,7 +189,7 @@ public class Similarity {
      * @return A clone of the HashMap
      */
     public Map<String, BigInteger> getMap() {
-        return null;
+        return new HashMap<>(hashMap);
     }
 
 }

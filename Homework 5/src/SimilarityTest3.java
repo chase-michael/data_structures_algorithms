@@ -34,7 +34,7 @@ public class SimilarityTest3 {
      * @param sim Similarity object to deal with
      */
     private static void printOutput(Similarity sim) {
-        System.out.println(sim.numOfLines() + " lines.");    
+        System.out.println(sim.numOfLines() + " lines.");
         System.out.println(sim.numOfWords() + " words.");
         System.out.println(sim.numOfWordsNoDups() + " distinct words.");
         System.out.println(sim.euclideanNorm() + " Euclidean norm.\n");
